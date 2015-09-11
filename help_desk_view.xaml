@@ -1,0 +1,36 @@
+!!! xml1.0
+%openerp
+    %data
+
+        %record model='ir.ui.view' #fnx_help_desk_form_view
+            @name: fnx.help_desk.form
+            @model: fnx.help_desk
+            @arch type='xml'
+                %form $Help_Desk version='7.0'
+                    %header
+                        @state widget='statusbar' clickable='True'
+                    %group
+                        @id invisible='1'
+                        @name
+                        @description
+                    %group readwrite="groups('fnx_hd.user')"
+                        @user_solution
+                    %group visible="groups('fnx_hd.user')" readwrite="groups('fnx_hd.user')"
+                        @tech_solution
+
+        %record model='ir.ui.view' #fnx_help_desk_tree_view
+            @name: fnx.help_desk.tree
+            @model: fnx.help_desk
+            @arch type='xml'
+                %tree $Help_Desk
+                    @name
+                    @state
+
+        %record model='ir.actions.act_window' #fnx_help_desk_action
+            @name: IT Help Desk
+            @type: ir.actions.act_window
+            @res_model: fnx.help_desk
+            @view_type: form
+            @view_mode: tree,form
+
+        %menuitem name='Help Desk' sequence='99' parent='mail.mail_feeds' action='fnx_help_desk_action' #fnx_help_desk_menu
