@@ -16,5 +16,5 @@
         %record model='res.groups' #manager
             @name: Manager
             @category_id ref='fnx_help_desk'
-            @implide_ids eval="[(4, ref('user'))]"
+            @implied_ids eval="[(4, ref('user'))]"
             @comment: Manager can set EvS status
