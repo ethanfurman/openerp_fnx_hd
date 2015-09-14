@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fnx_help_desk_all,access_fnx_help_desk,model_fnx_help_desk,,1,1,1,0
 access_fnx_help_desk,access_fnx_help_desk,model_fnx_help_desk,fnx_hd.user,1,1,1,1
