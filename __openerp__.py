@@ -20,7 +20,6 @@
         'security/help_desk_security.xaml',
         'security/ir.model.access.csv',
         'help_desk_view.xaml',
-        'res_config_view.xaml',
         ],
     'test': [],
     'installable': True,

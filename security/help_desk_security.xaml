@@ -8,13 +8,17 @@
             @sequence: 90
             @description: Report and solve various technical problems.
 
-        %record model='res.groups' #fnx_help_desk_user
-            @name: User
+        %record model='res.groups' #fnx_help_desk_triage
+            @name: Triage
             @category_id ref='fnx_help_desk'
-            @comment: User can edit solutions
+            @comment: User can assign issues
 
-        %record model='res.groups' #fnx_help_desk_manager
-            @name: Manager
+        %record model='res.groups' #fnx_help_desk_inhouse
+            @name: In-House
             @category_id ref='fnx_help_desk'
-            @implied_ids eval="[(4, ref('fnx_help_desk_user'))]"
-            @comment: Manager can set EvS status
+            @comment: User can edit user solutions and close issues
+
+        %record model='res.groups' #fnx_help_desk_evs
+            @name: EvS
+            @category_id ref='fnx_help_desk'
+            @comment: User can edit tech solutions and close issues

@@ -71,17 +71,27 @@ class help_desk(osv.Model):
                     context=ctx)
         return new_id
 
+    def onchange_assigned(self, cr, uid, ids, assigned, context=None):
+        print assigned
+        return {}
+
     def write(self, cr, uid, ids, values, context=None):
         if context is None:
             context = {}
         assigned = values.get('assigned_to')
-        if 'state' in values and values['state'] != 'new':
-            user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-            if (
-                (values['state'] == 'evs' and not user.has_group('fnx_hd.fnx_help_desk_manager')) or
-                (values['state'] != 'evs' and not user.has_group('fnx_hd.fnx_help_desk_user'))
-                ):
-                raise ERPError('Permission Denied', 'You do not have permission to change the status to %s.' % values['state'])
+        if 'state' in values:
+            if context.get('help_desk_creation') and values['state'] == 'new':
+                pass
+            else:
+                user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+                if (
+                    (values['state'] == 'evs' and not user.has_group('fnx_hd.fnx_help_desk_manager')) or
+                    (values['state'] != 'evs' and not user.has_group('fnx_hd.fnx_help_desk_user'))
+                    ):
+                    raise ERPError(
+                        'Permission Denied',
+                        'You do not have permission to change the status to %s.' % values['state'],
+                        )
         if assigned and not context.get('help_desk_creation'):
             self.message_subscribe_users(cr, uid, ids, [assigned], context=context)
         return super(help_desk, self).write(cr, uid, ids, values, context=context)
