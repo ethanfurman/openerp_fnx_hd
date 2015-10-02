@@ -16,7 +16,7 @@
                         %group
                             @reported_by options="{'no_open':True}"
                         %group
-                            @assigned_to options="{'no_open':True}"
+                            @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}"
                     %group
                         @description
                     %group readwrite="groups('fnx_hd.fnx_help_desk_user')"
