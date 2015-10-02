@@ -30,16 +30,16 @@
                             %div
                                 @inhousers
                                     %tree
-                                    @name
-                                    @login
+                                        @name
+                                        @login
                     %group
                         %label for='id' $EvS
                         %div @evs
                             %div
                                 @evsers
                                     %tree
-                                    @name
-                                    @login
+                                        @name
+                                        @login
 
         %record model='ir.actions.act_window' #action_fnx_hd_config
             @name: Configure Fnx Help Desk
