@@ -75,11 +75,11 @@ class help_desk(osv.Model):
         if context is None:
             context = {}
         assigned = values.get('assigned_to')
-        if 'state' in values:
+        if 'state' in values and values['state'] != 'new':
             user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
             if (
-                not user.has_group('fnx_hd.fnx_help_desk_user')
-                or (values['state'] == 'evs' and not user.has_group('fnx_hd.fnx_help_desk_manager'))
+                (values['state'] == 'evs' and not user.has_group('fnx_hd.fnx_help_desk_manager')) or
+                (values['state'] != 'evs' and not user.has_group('fnx_hd.fnx_help_desk_user'))
                 ):
                 raise ERPError('Permission Denied', 'You do not have permission to change the status to %s.' % values['state'])
         if assigned and not context.get('help_desk_creation'):
