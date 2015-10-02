@@ -12,11 +12,22 @@
                     %group
                         @id invisible='1'
                         @name
+                    %group
+                        %group
+                            @reported_by options="{'no_open':True}"
+                        %group
+                            @assigned_to options="{'no_open':True}"
+                    %group
                         @description
-                    %group readwrite="groups('fnx_hd.user')"
+                    %group readwrite="groups('fnx_hd.fnx_help_desk_user')"
+                        @problem
+                    %group readwrite="groups('fnx_hd.fnx_help_desk_user')"
                         @user_solution
-                    %group visible="groups('fnx_hd.user')" readwrite="groups('fnx_hd.user')"
+                    %group visible="groups('fnx_hd.fnx_help_desk_user')" readwrite="groups('fnx_hd.fnx_help_desk_user')"
                         @tech_solution
+                    %div .oe_chatter
+                        @message_follower_ids widget='mail_followers'
+                        @message_ids widget='mail_thread' nolabel='1'
 
         %record model='ir.ui.view' #fnx_help_desk_tree_view
             @name: fnx.help_desk.tree
@@ -32,5 +43,6 @@
             @res_model: fnx.help_desk
             @view_type: form
             @view_mode: tree,form
+            @context: {'mail_track_initial':True}
 
         %menuitem name='Help Desk' sequence='99' parent='mail.mail_feeds' action='fnx_help_desk_action' #fnx_help_desk_menu
