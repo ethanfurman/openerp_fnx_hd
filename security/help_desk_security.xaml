@@ -4,7 +4,7 @@
     %data noupdate='1'
 
         %record model='ir.module.category' #fnx_help_desk
-            @name: Help Desk
+            @name: Fnx Help Desk
             @sequence: 90
             @description: Report and solve various technical problems.
 

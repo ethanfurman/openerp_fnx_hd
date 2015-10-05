@@ -21,6 +21,30 @@ class help_desk(osv.Model):
     _inherits = {}
     _mirrors = {}
 
+    def _get_partner_ids(self, cr, type):
+        # type -> one of ['Triage', 'In-House', 'EvS']
+        res_users = self.pool.get('res.users')
+        return [
+                u.partner_id.id
+                for u in res_users.browse(
+                    cr, SUPERUSER_ID,
+                    [('groups_id.name','=',type),('groups_id.category_id.name','=','Fnx Help Desk')],
+                    )
+                ]
+
+    def onchange_assigned(self, cr, uid, ids, assigned, context=None):
+        if not assigned:
+            return {}
+        user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, assigned, context=context)
+        if user.has_group('fnx_hd.fnx_help_desk_evs'):
+            state = 'evs'
+        elif user.has_group('fnx_hd.fnx_help_desk_inhouse'):
+            state = 'in_house'
+        else:
+            return {}
+        res = {'value': {'state':state}}
+        return res
+
     _columns = {
         'name': fields.char('Short Summary', size=256, required=True),
         'description': fields.text('Detailed Description', required=True),
@@ -36,7 +60,7 @@ class help_desk(osv.Model):
         'assigned_to': fields.many2one(
             'res.users',
             'Assigned To',
-            domain=[('groups_id.category_id.name','=','Help Desk'),],
+            domain=[('groups_id.category_id.name','=','Fnx Help Desk'),],
             track_visibility='change_only',
             ),
         }
@@ -49,49 +73,63 @@ class help_desk(osv.Model):
     def create(self, cr, uid, values, context=None):
         if context is None:
             context = {}
-        ctx = context.copy()
-        ctx['help_desk_creation'] = True
         assigned = values.get('assigned_to')
-        if assigned:
-            values['message_follower_user_ids'] = [assigned]
-        new_id = super(help_desk, self).create(cr, uid, values, context=ctx)
-        # issue has been created, notify Triage
-        res_users = self.pool.get('res.users')
-        user = res_users.browse(cr, uid, uid, context=context)
-        triage_ids = [u.id for u in user.company_id.triage_ids]
-        print 'triage ids', triage_ids
-        if triage_ids:
-            print 'notifying...'
-            res_users.message_notify(
-                    cr, uid, triage_ids,
-                    body="Issue created",
-                    type='email',
-                    model=self._name,
-                    res_id=new_id,
-                    context=ctx)
-        return new_id
-
-    def onchange_assigned(self, cr, uid, ids, assigned, context=None):
-        print assigned
-        return {}
+        values['message_follower_ids'] = [
+                self.pool.get('res.users').browse(cr, uid, values['reported_by']).partner_id.id
+                    ]
+        if not assigned:
+            values['message_notify_ids'] = self._get_partner_ids(cr, 'Triage')
+        else:
+            values['message_follower_user_ids'].append[assigned]
+            user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, assigned, context=context)
+            if user.has_group('fnx_hd.fnx_help_desk_evs'):
+                values['state'] = 'evs'
+            elif user.has_group('fnx_hd.fnx_help_desk_inhouse'):
+                values['state'] = 'in_house'
+            else:
+                raise ValueError('unrecognized group for %r' % user.login)
+        return super(help_desk, self).create(cr, uid, values, context=context)
 
     def write(self, cr, uid, ids, values, context=None):
         if context is None:
             context = {}
         assigned = values.get('assigned_to')
+        if assigned:
+            values['message_follower_user_ids'] = [assigned]
         if 'state' in values:
-            if context.get('help_desk_creation') and values['state'] == 'new':
-                pass
-            else:
-                user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-                if (
-                    (values['state'] == 'evs' and not user.has_group('fnx_hd.fnx_help_desk_manager')) or
-                    (values['state'] != 'evs' and not user.has_group('fnx_hd.fnx_help_desk_user'))
-                    ):
-                    raise ERPError(
-                        'Permission Denied',
-                        'You do not have permission to change the status to %s.' % values['state'],
-                        )
-        if assigned and not context.get('help_desk_creation'):
-            self.message_subscribe_users(cr, uid, ids, [assigned], context=context)
-        return super(help_desk, self).write(cr, uid, ids, values, context=context)
+            state = values['state']
+            user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+            if (
+                (state == 'evs' and not (user.has_group('fnx_hd.fnx_help_desk_triage') or user.has_group('fnx_hd.fnx_help_desk_evs'))) or
+                (state == 'in_house' and not (user.has_group('fnx_hd.fnx_help_desk_triage') or user.has_group('fnx_hd.fnx_help_desk_inhouse'))) or
+                (state == 'done' and not (user.has_group('fnx_hd.fnx_help_desk_evs') or user.has_group('fnx_hd.fnx_help_desk_inhouse')))
+                ):
+                raise ERPError(
+                    'Permission Denied',
+                    'You do not have permission to change the status to %s.' % state,
+                    )
+            if not assigned and state != 'done':
+                # if no one is assigned, notify the group
+                issues = self.read(cr, uid, ids, fields=['id', 'assigned_to'], context=context)
+                assigned_issues = []
+                unassigned_issues = []
+                for issue in issues:
+                    if issue['assigned_to']:
+                        assigned_issues.append(issue['id'])
+                    else:
+                        unassigned_issues.append(issue['id'])
+                if unassigned_issues:
+                    if state == 'new':
+                        notify_ids = self._get_partner_ids(cr, 'Triage')
+                    elif state == 'in_house':
+                        notify_ids = self._get_partner_ids(cr, 'In-House')
+                    elif state == 'evs':
+                        notify_ids = self._get_partner_ids(cr, 'EvS')
+                    vals = values.copy()
+                    vals['message_notify_ids'] = notify_ids
+                if not super(help_desk, self).write(cr, uid, unassigned_issues, vals, context=context):
+                    return False
+                ids = assigned_issues
+        if ids:
+            return super(help_desk, self).write(cr, uid, ids, values, context=context)
+        return True

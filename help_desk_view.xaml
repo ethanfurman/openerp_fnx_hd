@@ -14,7 +14,7 @@
                         @name
                     %group
                         %group
-                            @reported_by options="{'no_open':True}"
+                            @reported_by options="{'no_open':True, 'create_edit':False, 'limit':15}"
                         %group
                             @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}" on_change="onchange_assigned(assigned_to)"
                     %group
@@ -23,7 +23,7 @@
                         @problem
                     %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
                         @user_solution
-                    %group visible="groups('fnx_hd.fnx_help_desk_inhouse')" readwrite="groups('fnx_hd.fnx_help_desk_evs')"
+                    %group visible="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" readwrite="groups('fnx_hd.fnx_help_desk_evs')"
                         @tech_solution
                     %div .oe_chatter
                         @message_follower_ids widget='mail_followers'
