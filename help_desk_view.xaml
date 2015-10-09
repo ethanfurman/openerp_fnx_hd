@@ -20,9 +20,10 @@
                     %group
                         @description
                     %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
-                        @problem
-                    %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
                         @user_solution
+                    %hr
+                    %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
+                        @problem
                     %group visible="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" readwrite="groups('fnx_hd.fnx_help_desk_evs')"
                         @tech_solution
                     %div .oe_chatter
