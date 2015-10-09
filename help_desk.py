@@ -80,8 +80,8 @@ class help_desk(osv.Model):
         if not assigned:
             values['message_notify_ids'] = self._get_partner_ids(cr, 'Triage')
         else:
-            values['message_follower_ids'].append(assigned)
             user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, assigned, context=context)
+            values['message_follower_ids'].append(user.partner_id.id)
             if user.has_group('fnx_hd.fnx_help_desk_evs'):
                 values['state'] = 'evs'
             elif user.has_group('fnx_hd.fnx_help_desk_inhouse'):
