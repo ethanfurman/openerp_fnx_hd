@@ -16,7 +16,7 @@
                         %group
                             @reported_by options="{'no_open':True, 'create_edit':False, 'limit':15}"
                         %group
-                            @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}" on_change="onchange_assigned(assigned_to)"
+                            @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}" on_change="onchange_assigned(assigned_to)" readwrite="groups('fnx_hd.fnx_help_desk_triage,fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" 
                     %group
                         @description
                     %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"

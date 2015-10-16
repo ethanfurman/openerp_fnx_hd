@@ -46,11 +46,11 @@ class help_desk(osv.Model):
         return res
 
     _columns = {
-        'name': fields.char('Short Summary', size=256, required=True),
-        'description': fields.text('Detailed Description', required=True),
-        'problem': fields.text('Problem'),
-        'user_solution': fields.text('User Solution'),
-        'tech_solution': fields.text('Tech Solution'),
+        'name': fields.char('Short Summary', size=256, required=True, track_visibility='change_only'),
+        'description': fields.text('Detailed Description', required=True, track_visibility='change_only'),
+        'problem': fields.text('Problem', track_visibility='change_only'),
+        'user_solution': fields.text('User Solution', track_visibility='change_only'),
+        'tech_solution': fields.text('Tech Solution', track_visibility='change_only'),
         'state': fields.selection(
             (('new', 'New'), ('in_house', 'In House'), ('evs', 'EvS'),  ('done', 'Resolved')),
             string='Status',
@@ -66,36 +66,49 @@ class help_desk(osv.Model):
         }
 
     _defaults = {
-        'state': lambda *a: 'new',
         'reported_by': lambda obj,cr,uid,ctx: uid != 1 and uid or False
         }
 
     def create(self, cr, uid, values, context=None):
         if context is None:
             context = {}
-        assigned = values.get('assigned_to')
+        res_users = self.pool.get('res.users')
+        user = res_users.browse(cr, uid, uid, context=context)
+        assigned_id = values.get('assigned_to')
         values['message_follower_ids'] = [
                 self.pool.get('res.users').browse(cr, uid, values['reported_by']).partner_id.id
                     ]
-        if not assigned:
+        if not assigned_id:
             values['message_notify_ids'] = self._get_partner_ids(cr, 'Triage')
+            values['state'] = 'new'
         else:
-            user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, assigned, context=context)
-            values['message_follower_ids'].append(user.partner_id.id)
-            if user.has_group('fnx_hd.fnx_help_desk_evs'):
-                values['state'] = 'evs'
-            elif user.has_group('fnx_hd.fnx_help_desk_inhouse'):
-                values['state'] = 'in_house'
+            assigned_user = res_users.browse(cr, SUPERUSER_ID, assigned_id, context=context)
+            values['message_follower_ids'].append(assigned_user.partner_id.id)
+            if assigned_user.has_group('fnx_hd.fnx_help_desk_evs'):
+                if (    user.has_group('fnx_hd.fnx_help_desk_evs') or
+                        user.has_group('fnx_hd.fnx_help_desk_triage')
+                    ):
+                    values['state'] = 'evs'
+                else:
+                    raise ERPError('Permission Denied', 'You do not have permission to assign to %s' % assigned_user.login)
+            elif assigned_user.has_group('fnx_hd.fnx_help_desk_inhouse'):
+                if (    user.has_group('fnx_hd.fnx_help_desk_evs') or
+                        user.has_group('fnx_hd.fnx_help_desk_inhouse') or
+                        user.has_group('fnx_hd.fnx_help_desk_triage')
+                    ):
+                    values['state'] = 'in_house'
+                else:
+                    raise ERPError('Permission Denied', 'You do not have permission to assign to %s' % assigned_user.login)
             else:
-                raise ValueError('unrecognized group for %r' % user.login)
+                raise ERPError('Error', 'unrecognized group for %r' % assigned_user.login)
         return super(help_desk, self).create(cr, uid, values, context=context)
 
     def write(self, cr, uid, ids, values, context=None):
         if context is None:
             context = {}
-        assigned = values.get('assigned_to')
-        if assigned:
-            values['message_follower_user_ids'] = [assigned]
+        assigned_id = values.get('assigned_to')
+        if assigned_id:
+            values['message_follower_user_ids'] = [assigned_id]
         if 'state' in values:
             state = values['state']
             user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
@@ -108,7 +121,7 @@ class help_desk(osv.Model):
                     'Permission Denied',
                     'You do not have permission to change the status to %s.' % state,
                     )
-            if not assigned and state != 'done':
+            if not assigned_id and state != 'done':
                 # if no one is assigned, notify the group
                 issues = self.read(cr, uid, ids, fields=['id', 'assigned_to'], context=context)
                 assigned_issues = []
