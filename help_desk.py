@@ -80,7 +80,8 @@ class help_desk(osv.Model):
                     ]
         if not assigned_id:
             values['message_notify_ids'] = self._get_partner_ids(cr, 'Triage')
-            values['state'] = 'new'
+            if not values.get('state'):
+                values['state'] = 'new'
         else:
             assigned_user = res_users.browse(cr, SUPERUSER_ID, assigned_id, context=context)
             values['message_follower_ids'].append(assigned_user.partner_id.id)
