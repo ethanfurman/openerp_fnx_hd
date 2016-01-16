@@ -1,44 +1,44 @@
 !!! xml1.0
-%openerp
-    %data
+~openerp
+    ~data
 
-        %record model='ir.ui.view' #fnx_help_desk_form_view
+        ~record model='ir.ui.view' #fnx_help_desk_form_view
             @name: fnx.help_desk.form
             @model: fnx.help_desk
             @arch type='xml'
-                %form $Help_Desk version='7.0'
-                    %header
+                ~form $Help_Desk version='7.0'
+                    ~header
                         @state widget='statusbar' clickable='True'
-                    %group
+                    ~group
                         @id invisible='1'
                         @name
-                    %group
-                        %group
+                    ~group
+                        ~group
                             @reported_by options="{'no_open':True, 'create_edit':False, 'limit':15}"
-                        %group
+                        ~group
                             @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}" on_change="onchange_assigned(assigned_to)" readwrite="groups('fnx_hd.fnx_help_desk_triage,fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" 
-                    %group
+                    ~group
                         @description
-                    %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
+                    ~group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
                         @user_solution
-                    %hr
-                    %group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
+                    ~hr
+                    ~group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
                         @problem
-                    %group visible="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" readwrite="groups('fnx_hd.fnx_help_desk_evs')"
+                    ~group visible="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" readwrite="groups('fnx_hd.fnx_help_desk_evs')"
                         @tech_solution
-                    %div .oe_chatter
+                    ~div .oe_chatter
                         @message_follower_ids widget='mail_followers'
                         @message_ids widget='mail_thread' nolabel='1'
 
-        %record model='ir.ui.view' #fnx_help_desk_tree_view
+        ~record model='ir.ui.view' #fnx_help_desk_tree_view
             @name: fnx.help_desk.tree
             @model: fnx.help_desk
             @arch type='xml'
-                %tree $Help_Desk
+                ~tree $Help_Desk
                     @name
                     @state
 
-        %record model='ir.actions.act_window' #fnx_help_desk_action
+        ~record model='ir.actions.act_window' #fnx_help_desk_action
             @name: IT Help Desk
             @type: ir.actions.act_window
             @res_model: fnx.help_desk
@@ -46,4 +46,4 @@
             @view_mode: tree,form
             @context: {'mail_track_initial':True}
 
-        %menuitem name='Help Desk' sequence='99' parent='mail.messaging_miscellany' action='fnx_help_desk_action' #fnx_help_desk_menu
+        ~menuitem name='Help Desk' sequence='99' parent='mail.messaging_miscellany' action='fnx_help_desk_action' #fnx_help_desk_menu

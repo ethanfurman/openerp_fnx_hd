@@ -1,24 +1,24 @@
 !!! xml1.0
 
-%openerp
-    %data noupdate='1'
+~openerp
+    ~data noupdate='1'
 
-        %record model='ir.module.category' #fnx_help_desk
+        ~record model='ir.module.category' #fnx_help_desk
             @name: Fnx Help Desk
             @sequence: 90
             @description: Report and solve various technical problems.
 
-        %record model='res.groups' #fnx_help_desk_triage
+        ~record model='res.groups' #fnx_help_desk_triage
             @name: Triage
             @category_id ref='fnx_help_desk'
             @comment: User can assign issues
 
-        %record model='res.groups' #fnx_help_desk_inhouse
+        ~record model='res.groups' #fnx_help_desk_inhouse
             @name: In-House
             @category_id ref='fnx_help_desk'
             @comment: User can edit user solutions and close issues
 
-        %record model='res.groups' #fnx_help_desk_evs
+        ~record model='res.groups' #fnx_help_desk_evs
             @name: EvS
             @category_id ref='fnx_help_desk'
             @comment: User can edit tech solutions and close issues
