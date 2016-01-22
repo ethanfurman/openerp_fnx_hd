@@ -16,15 +16,15 @@
                         ~group
                             @reported_by options="{'no_open':True, 'create_edit':False, 'limit':15}"
                         ~group
-                            @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}" on_change="onchange_assigned(assigned_to)" readwrite="groups('fnx_hd.fnx_help_desk_triage,fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" 
+                            @assigned_to options="{'no_open':True, 'create_edit':False, 'limit':15}" on_change="onchange_assigned(assigned_to)" writeonly="groups('fnx_hd.fnx_help_desk_triage,fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" 
                     ~group
                         @description
-                    ~group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
+                    ~group writeonly="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
                         @user_solution
                     ~hr
-                    ~group readwrite="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
+                    ~group writeonly="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')"
                         @problem
-                    ~group visible="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" readwrite="groups('fnx_hd.fnx_help_desk_evs')"
+                    ~group visible="groups('fnx_hd.fnx_help_desk_inhouse,fnx_hd.fnx_help_desk_evs')" writeonly="groups('fnx_hd.fnx_help_desk_evs')"
                         @tech_solution
                     ~div .oe_chatter
                         @message_follower_ids widget='mail_followers'
