@@ -1,13 +1,6 @@
-import threading
-import string
-import openerp
-from collections import defaultdict
-from fnx import translator, grouped
 from openerp import SUPERUSER_ID
 from osv.osv import except_osv as ERPError
-from osv import fields, osv, orm
-from psycopg2 import ProgrammingError
-from xaml import Xaml
+from osv import fields, osv
 
 POS_NEG_NA = (
     ('negative', 'Negative'),
@@ -76,7 +69,7 @@ class help_desk(osv.Model):
         user = res_users.browse(cr, uid, uid, context=context)
         assigned_id = values.get('assigned_to')
         values['message_follower_ids'] = [
-                self.pool.get('res.users').browse(cr, uid, values['reported_by']).partner_id.id
+                self.pool.get('res.users').browse(cr, uid, values['reported_by'], context=context).partner_id.id
                     ]
         if not assigned_id:
             values['message_notify_ids'] = self._get_partner_ids(cr, 'Triage')
