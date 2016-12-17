@@ -147,7 +147,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def check_notified(self, issue_id, should_be_notified_ids, num_messages):
         time.sleep(1)
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, uid= self.cr, self.uid
         if isinstance(should_be_notified_ids, (int, long)):
             should_be_notified_ids = [should_be_notified_ids]
         issue = self.help_desk.browse(cr, 1, issue_id)
@@ -216,7 +216,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def test_inhouse_create(self):
         """Triage users should be notified"""
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.help_desk.create(
             cr, self.inhouse_user_id,
             dict(
@@ -232,7 +232,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def test_inhouse_create_assign_inhouse_user(self):
         """Triage users should /not/ be notified, in-house user should be."""
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.help_desk.create(
             cr, self.inhouse_user_id,
             dict(
@@ -249,7 +249,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def test_inhouse_create_assign_evs_user(self):
         """Triage users should /not/ be notified, evs user should be."""
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         self.assertRaises(ERPError, self.help_desk.create,
             cr, self.inhouse_user_id,
             dict(
@@ -263,7 +263,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def test_evs_create(self):
         """Triage users should be notified"""
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.help_desk.create(
             cr, self.evs_user_id,
             dict(
@@ -279,7 +279,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def test_evs_create_assign_inhouse_user(self):
         """Triage users should /not/ be notified, in-house user should be."""
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.help_desk.create(
             cr, self.evs_user_id,
             dict(
@@ -296,7 +296,7 @@ class TestFnxHelpDesk(common.TransactionCase):
 
     def test_evs_create_assign_evs_user(self):
         """Triage users should /not/ be notified, evs user should be."""
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.help_desk.create(
             cr, self.evs_user_id,
             dict(
@@ -312,26 +312,26 @@ class TestFnxHelpDesk(common.TransactionCase):
         return issue_id
 
     def test_triage_assign_inhouse_group(self):
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.test_simple_create()
         self.help_desk.write(cr, self.triage_user_id, [issue_id], {'state':'in_house'}, context=context)
         issue = self.check_notified(issue_id, self.inhouse_group_partner_ids, 2)
         self.check_followers(issue, [self.user.partner_id])
 
     def test_triage_assign_evs_group(self):
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.test_simple_create()
         self.help_desk.write(cr, self.triage_user_id, [issue_id], {'state':'evs'}, context=context)
         issue = self.check_notified(issue_id, self.evs_group_partner_ids, 2)
         self.check_followers(issue, [self.user.partner_id])
 
     def test_user_assign_inhouse_group(self):
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.test_simple_create()
         self.assertRaises(ERPError, self.help_desk.write, cr, self.user_id, [issue_id], {'state':'evs'}, context=context)
 
     def test_user_assign_evs_group(self):
-        cr, uid, context = self.cr, self.uid, self.context
+        cr, context = self.cr, self.context
         issue_id = self.test_simple_create()
         self.assertRaises(ERPError, self.help_desk.write, cr, self.user_id, [issue_id], {'state':'evs'}, context=context)
 
