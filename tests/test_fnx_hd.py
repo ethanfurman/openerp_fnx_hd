@@ -6,7 +6,7 @@ from __future__ import print_function
 from scription import *
 import openerp
 import openerp.osv
-from openerp.osv.osv import except_osv as ERPError
+from openerp.exceptions import ERPError
 from openerp.tools import config
 from openerp.tests import common
 import time
