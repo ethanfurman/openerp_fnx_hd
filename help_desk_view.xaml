@@ -46,4 +46,4 @@
             @view_mode: tree,form
             @context: {'mail_track_initial':True}
 
-        ~menuitem name='Help Desk' sequence='99' parent='mail.messaging_miscellany' action='fnx_help_desk_action' #fnx_help_desk_menu
+        ~menuitem name='Ask Alyssa' sequence='99' parent='mail.messaging_miscellany' action='fnx_help_desk_action' #fnx_help_desk_menu
